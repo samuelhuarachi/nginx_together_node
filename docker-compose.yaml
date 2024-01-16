@@ -1,0 +1,110 @@
+version: '3'
+services: 
+    # mysql:
+
+    nginx: 
+
+        build: 
+            dockerfile: ./docker/nginx.dockerfile
+            context: .
+        image: nginx:latest
+        container_name: nginx
+        ports:
+            - "5003:80"
+        networks: 
+            hospital-network:
+                ipv4_address: 172.16.24.6
+        volumes:
+            - ./docker/config/:/etc/nginx/
+            - ./client:/var/www
+        # depends_on:
+        #     - node1
+        #     - node2
+        #     - node3
+
+
+    # node1:
+    #     build:
+    #         dockerfile: ./dockerfile/hospital-api.dockerfile
+    #         context: .
+    #     image: node:latest
+    #     container_name: node1
+    #     ports: 
+    #         - "3000"
+    #     networks:
+    #         hospital-network:
+    #             ipv4_address: 172.19.0.7
+    #     volumes:
+    #         - .:/var/www
+    #     working_dir: /var/www
+    #     command: bash -c "npm i -g nodemon && npm i"
+
+    # node2:
+    #     build:
+    #         dockerfile: ./dockerfile/hospital-api.dockerfile
+    #         context: .
+    #     image: node:latest
+    #     container_name: node2
+    #     ports: 
+    #         - "3000"
+    #     networks:
+    #         hospital-network:
+    #             ipv4_address: 172.19.0.8
+    #     volumes:
+    #         - .:/var/www
+    #     working_dir: /var/www
+    #     command: bash -c "npm i -g nodemon && npm i"
+
+    # node3:
+    #     build:
+    #         dockerfile: ./dockerfile/hospital-api.dockerfile
+    #         context: .
+    #     image: node:latest
+    #     container_name: node3
+    #     ports: 
+    #         - "3000"
+    #     networks:
+    #         hospital-network:
+    #             ipv4_address: 172.19.0.9
+    #     volumes:
+    #         - .:/var/www
+    #     working_dir: /var/www
+    #     command: bash -c "npm i -g nodemon && npm i"
+
+
+    node:
+        image: node:latest
+        container_name: node
+        networks:
+            hospital-network:
+                ipv4_address: 172.16.24.5
+        ports: 
+            - 3000:3000
+        # depends_on:
+        #     - "mysql"
+        volumes:
+            - ./server:/api
+        working_dir: /api
+        command: bash -c "npm i -g nodemon && npm i && npm start"
+        
+    node2:
+        image: node:latest
+        container_name: node2
+        networks:
+            hospital-network:
+                ipv4_address: 172.16.24.7
+        ports: 
+            - 3001:3000 
+        # depends_on:
+        #     - "mysql"
+        volumes:
+            - ./server2:/api
+        working_dir: /api
+        command: bash -c "npm i -g nodemon && npm i && npm start"
+
+networks: 
+    hospital-network:
+        driver: bridge
+        ipam:
+         config:
+           - subnet: 172.16.24.0/16
